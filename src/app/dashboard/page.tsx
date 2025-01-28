@@ -1,11 +1,11 @@
-
+import { JobTable } from "@/components/dashboard/JobTable";
 import React from "react";
 
 const page = () => {
   return (
-    <>
-      page
-    </>
+    <div>
+      <JobTable />
+    </div>
   );
 };
 
