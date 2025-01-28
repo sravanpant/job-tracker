@@ -4,9 +4,11 @@ import {
   integer,
   pgTableCreator,
   primaryKey,
+  serial,
   text,
   timestamp,
   varchar,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -30,13 +32,48 @@ export const posts = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
+      () => new Date(),
     ),
   },
   (example) => ({
     createdByIdIdx: index("created_by_idx").on(example.createdById),
     nameIndex: index("name_idx").on(example.name),
-  })
+  }),
+);
+
+export const jobs = createTable(
+  "jobs",
+  {
+    id: serial("id").primaryKey(),
+    company: varchar("company", { length: 255 }).notNull(),
+    role: varchar("role", { length: 255 }).notNull(),
+    jobId: varchar("job_id", { length: 255 }),
+    location: varchar("location", { length: 255 }),
+    status: varchar("status", {
+      length: 50,
+      enum: ["applied", "interviewing", "offered", "rejected"],
+    }).default("applied"),
+    salary: varchar("salary", { length: 100 }),
+    jobType: varchar("job_type", {
+      length: 50,
+      enum: ["full-time", "part-time", "contract", "internship"],
+    }),
+    remote: boolean("remote").default(false),
+    description: text("description"),
+    notes: text("notes"),
+    applicationUrl: varchar("application_url", { length: 255 }),
+    appliedDate: timestamp("applied_date").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+    nextFollowUp: timestamp("next_follow_up"),
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (job) => ({
+    userIdIdx: index("job_user_id_idx").on(job.userId),
+    companyIdx: index("job_company_idx").on(job.company),
+    statusIdx: index("job_status_idx").on(job.status),
+  }),
 );
 
 export const users = createTable("user", {
@@ -55,14 +92,24 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  sessions: many(sessions),
+  jobs: many(jobs), // Add relation to jobs
 }));
+
+export const jobsRelations = relations(jobs, ({ one }) => ({
+  user: one(users, {
+    fields: [jobs.userId],
+    references: [users.id],
+  }),
+}));
+
 
 export const accounts = createTable(
   "account",
   {
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id),  
     type: varchar("type", { length: 255 })
       .$type<AdapterAccount["type"]>()
       .notNull(),
@@ -83,7 +130,7 @@ export const accounts = createTable(
       columns: [account.provider, account.providerAccountId],
     }),
     userIdIdx: index("account_user_id_idx").on(account.userId),
-  })
+  }),
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -106,7 +153,7 @@ export const sessions = createTable(
   },
   (session) => ({
     userIdIdx: index("session_user_id_idx").on(session.userId),
-  })
+  }),
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -125,5 +172,5 @@ export const verificationTokens = createTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
+  }),
 );

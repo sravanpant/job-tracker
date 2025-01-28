@@ -1,3 +1,4 @@
+// src/server/auth/config.ts
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -21,15 +22,9 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      // Add more custom properties if needed
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 /**
@@ -40,14 +35,17 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: process.env.GITHUB_CLIENT_ID ?? "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
@@ -55,12 +53,19 @@ export const authConfig = {
     verificationTokensTable: verificationTokens,
   }),
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    async jwt({ token, user }) {
+      // Attach the user ID to the token on login
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Attach the user ID to the session
+      if (token) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
 } satisfies NextAuthConfig;
