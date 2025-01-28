@@ -8,7 +8,7 @@
 ## To do list
 - [x] Create a basic UI
 - [x] Add authentication
-- [x] Created session management
+- [x] Create session management
 - [x] Setup database
 - [x] Add middleware 
 - [ ] Add dashboard
