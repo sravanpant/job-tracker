@@ -6,9 +6,12 @@
 - Somehow to add the gmail functionality also so that when the user recieves the mail the extension will automatically detect that the user has been rejected/selected and will automatically update the database.
 
 ## To do list
-- [ ] Create a basic UI
+- [x] Create a basic UI
 - [x] Add authentication
+- [x] Created session management
 - [x] Setup database
+- [x] Add middleware 
+- [ ] Add dashboard
 - [ ] Add testing
 - [ ] Add analytics
 - [ ] Deployment
