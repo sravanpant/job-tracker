@@ -1,5 +1,5 @@
 // src/components/job-tracker/CreateJobDialog.tsx
-"use client"
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -35,9 +35,13 @@ const formSchema = z.object({
   role: z.string().min(1, "Role is required"),
   jobId: z.string().optional(),
   location: z.string().optional(),
-  status: z.enum(["applied", "interviewing", "offered", "rejected"]).default("applied"),
+  status: z
+    .enum(["applied", "interviewing", "offered", "rejected"])
+    .default("applied"),
   salary: z.string().optional(),
-  jobType: z.enum(["full-time", "part-time", "contract", "internship"]).default("full-time"),
+  jobType: z
+    .enum(["full-time", "part-time", "contract", "internship"])
+    .default("full-time"),
   remote: z.boolean().default(false),
   description: z.string().optional(),
   notes: z.string().optional(),
@@ -52,8 +56,8 @@ interface CreateJobDialogProps {
 }
 
 export function CreateJobDialog({ open, setOpen }: CreateJobDialogProps) {
-  const utils = api.useContext();
-  
+  const utils = api.useUtils();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,32 +69,35 @@ export function CreateJobDialog({ open, setOpen }: CreateJobDialogProps) {
     },
   });
 
-  const createJob = api.job.create.useMutation({
-    onSuccess: () => {
-      utils.job.getAll.invalidate();
+  const { mutate, isPending } = api.job.create.useMutation({
+    onSuccess: async () => {
+      await utils.job.getAll.invalidate();
       setOpen(false);
       form.reset();
     },
   });
 
   function onSubmit(values: FormValues) {
-    createJob.mutate(values);
+    mutate(values);
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-[425px] max-h-[800px] overflow-auto md:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Add New Job Application</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="gap-4 md:grid md:grid-cols-2 "
+          >
             <FormField
               control={form.control}
-              name="company"
+              name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Company</FormLabel>
+                  <FormLabel>Role</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -101,10 +108,10 @@ export function CreateJobDialog({ open, setOpen }: CreateJobDialogProps) {
 
             <FormField
               control={form.control}
-              name="role"
+              name="company"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel>Company</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -133,7 +140,10 @@ export function CreateJobDialog({ open, setOpen }: CreateJobDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
@@ -157,7 +167,10 @@ export function CreateJobDialog({ open, setOpen }: CreateJobDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Job Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select job type" />
@@ -248,10 +261,9 @@ export function CreateJobDialog({ open, setOpen }: CreateJobDialogProps) {
                 </FormItem>
               )}
             />
-
-            <div className="flex justify-end">
-              <Button type="submit" disabled={createJob.isLoading}>
-                {createJob.isLoading ? "Creating..." : "Create Job"}
+            <div className="col-span-2 flex justify-center">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Creating..." : "Create Job"}
               </Button>
             </div>
           </form>

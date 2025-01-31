@@ -9,13 +9,11 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 
 import { SessionProvider } from "next-auth/react";
-import ModeToggle from "@/components/shared/ToggleButton";
 
 interface DashboardLayoutProps {
   children: ReactNode;

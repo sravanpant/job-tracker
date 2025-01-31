@@ -1,4 +1,4 @@
-// src/components/job-tracker/JobTableColumns.tsx
+// src/components/dashboard/JobTableColumns.tsx
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,11 +28,18 @@ export const JobTableColumns: ColumnDef<Job>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "job_id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Job ID" />
+    ),
+  },
+  {
     accessorKey: "company",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Company" />
     ),
   },
+
   {
     accessorKey: "role",
     header: ({ column }) => (
@@ -46,22 +53,28 @@ export const JobTableColumns: ColumnDef<Job>[] = [
     ),
   },
   {
+    accessorKey: "salary",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Salary" />
+    ),
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const status: string = row.getValue("status");
       return (
         <Badge
           className={
             status === "applied"
               ? "bg-blue-500"
               : status === "interviewing"
-              ? "bg-yellow-500"
-              : status === "offered"
-              ? "bg-green-500"
-              : "bg-red-500"
+                ? "bg-yellow-500"
+                : status === "offered"
+                  ? "bg-green-500"
+                  : "bg-red-500"
           }
         >
           {status}
@@ -88,7 +101,7 @@ export const JobTableColumns: ColumnDef<Job>[] = [
       <DataTableColumnHeader column={column} title="Applied Date" />
     ),
     cell: ({ row }) => {
-      const date = row.getValue("appliedDate") as Date;
+      const date: Date = row.getValue("appliedDate");
       return format(date, "PPP");
     },
   },

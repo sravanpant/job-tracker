@@ -1,4 +1,4 @@
-// src/components/job-tracker/DataTableColumnHeader.tsx
+// src/components/dashboard/DataTableColumnHeader.tsx
 import { type Column } from "@tanstack/react-table";
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";

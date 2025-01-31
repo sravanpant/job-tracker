@@ -7,7 +7,7 @@ const config = {
   },
   plugins: ["@typescript-eslint", "drizzle"],
   extends: [
-    "next/core-web-vitials",
+    "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
   ],
@@ -15,6 +15,7 @@ const config = {
     // Existing rules
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
+    // "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
@@ -32,7 +33,7 @@ const config = {
         },
       },
     ],
-    
+
     // Drizzle rules
     "drizzle/enforce-delete-with-where": [
       "error",
@@ -53,8 +54,8 @@ const config = {
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/ban-types": [
-      "error",
+    "@typescript-eslint/ban": [
+      "off",
       {
         types: {
           "{}": false,
